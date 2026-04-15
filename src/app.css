@@ -6,6 +6,7 @@
 }
 
 :root {
+  /* Тёмная тема (по умолчанию) */
   --bg: #0f0f0f;
   --surface: #1a1a1a;
   --surface-hover: #252525;
@@ -16,6 +17,18 @@
   --text-secondary: #939393;
   --border: #2a2a2a;
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+[data-theme="light"] {
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --surface-hover: #f0f2f5;
+  --primary: #5181b8;
+  --primary-hover: #6a9fd4;
+  --accent: #e64646;
+  --text-primary: #1a1a1a;
+  --text-secondary: #6a6a6a;
+  --border: #e1e3e6;
 }
 
 html, body {

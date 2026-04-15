@@ -1,5 +1,5 @@
 <script>
-  // Header component
+  import ThemeToggle from './ThemeToggle.svelte'
 </script>
 
 <header class="header">
@@ -9,9 +9,12 @@
         <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/>
         <path d="M10 16L14 20L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      <h1 class="logo-text">glavredus</h1>
+      <h1 class="logo-text">Glavredus</h1>
     </div>
-    <p class="tagline">Поиск групп ВКонтакте</p>
+    <div class="header-right">
+      <p class="tagline">Поиск групп ВКонтакте</p>
+      <ThemeToggle />
+    </div>
   </div>
 </header>
 
@@ -32,6 +35,12 @@
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 12px;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
   }
 
   .logo {
@@ -62,6 +71,12 @@
     .header-content {
       flex-direction: column;
       align-items: flex-start;
+      gap: 16px;
+    }
+
+    .header-right {
+      width: 100%;
+      justify-content: space-between;
     }
     
     .tagline {
