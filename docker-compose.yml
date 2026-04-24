@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  # Frontend приложение (Svelte + Nginx)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    environment:
+      - NODE_ENV=production
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # Backend API (если есть)
+  # Раскомментируйте если у вас есть backend сервис
+  # backend:
+  #   image: node:20-alpine
+  #   working_dir: /app
+  #   volumes:
+  #     - ./backend:/app
+  #   command: npm start
+  #   ports:
+  #     - "8080:8080"
+  #   networks:
+  #     - app-network
+
+networks:
+  app-network:
+    driver: bridge

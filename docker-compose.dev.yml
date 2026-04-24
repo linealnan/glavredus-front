@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  # Frontend в режиме разработки с hot reload
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"
+    command: npm run dev -- --host 0.0.0.0
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:8080
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
