@@ -1,5 +1,6 @@
 <script>
   import { searchQuery } from '../stores/search.js'
+  let { onSearch = () => {} } = $props()
   
   let inputValue = $state('')
   let inputError = $state(false)
@@ -15,6 +16,7 @@
     }
     
     inputError = false
+    onSearch(trimmed)  // Вызываем переданный обработчик
     searchQuery.set(trimmed)
   }
   

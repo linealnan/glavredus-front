@@ -1,89 +1,62 @@
 <script>
   import Header from './lib/components/Header.svelte'
   import SearchBar from './lib/components/SearchBar.svelte'
-  import FilterBar from './lib/components/FilterBar.svelte'
-  import GroupList from './lib/components/GroupList.svelte'
-  import GroupModal from './lib/components/GroupModal.svelte'
+  import PostList from './lib/components/PostList.svelte'
   import Footer from './lib/components/Footer.svelte'
   
-  import { 
-    searchQuery, 
-    groups, 
-    loading, 
-    error, 
-    filterType, 
-    filterSort,
-    offset, 
-    hasMore,
-    resetSearch,
-    PAGE_SIZE
-  } from './lib/stores/search.js'
-  
-  import { searchGroups } from './lib/utils/mockData.js'
-  
-  // Выполняем поиск
-  async function performSearch() {
-    const query = $searchQuery
-    
-    if (!query || query.length < 2) return
-    
-    loading.set(true)
-    error.set(null)
-    
-    try {
-      const result = await searchGroups(
-        query,
-        { type: $filterType, sort: $filterSort },
-        0,
+  // Post search (API)
+  import {
+    searchQuery,
+    posts,
+    loading as postsLoading,
+    error as postsError,
+    total,
+    page,
+    hasMore as postsHasMore,
+    resetPosts,
         PAGE_SIZE
-      )
-      
-      groups.set(result.groups)
-      hasMore.set(result.hasMore)
-      offset.set(PAGE_SIZE)
+  } from './lib/stores/posts'
+  import { searchPosts } from './lib/api'
+
+  // Выполняем поиск постов (API)
+  async function performPostSearch(query) {
+    if (!query || query.length < 2) return
+
+    postsLoading.set(true)
+    postsError.set(null)
+    searchQuery.set(query)
+    resetPosts()
+
+    try {
+      const result = await searchPosts(query)
+
+      if (result.error) {
+        postsError.set(result.error)
+      } else {
+        posts.set(result.results)
+        total.set(result.total)
+        postsHasMore.set(result.results.length >= PAGE_SIZE)
+        page.set(2)
+    }
     } catch (e) {
-      error.set('Произошла ошибка при поиске. Попробуйте ещё раз.')
+      postsError.set('Не удалось выполнить поиск. Попробуйте ещё раз.')
       console.error(e)
     } finally {
-      loading.set(false)
+      postsLoading.set(false)
     }
   }
   
-  // Загрузка дополнительных результатов
-  async function loadMore() {
-    if ($loading || !$hasMore) return
-    
-    loading.set(true)
-    
-    try {
-      const result = await searchGroups(
-        $searchQuery,
-        { type: $filterType, sort: $filterSort },
-        $offset,
-        PAGE_SIZE
-      )
-      
-      groups.update(current => [...current, ...result.groups])
-      hasMore.set(result.hasMore)
-      offset.update(v => v + PAGE_SIZE)
-    } catch (e) {
-      error.set('Не удалось загрузить больше результатов.')
-    } finally {
-      loading.set(false)
-    }
+  // Загрузка дополнительных постов
+  async function loadMorePosts() {
+    if ($postsLoading || !$postsHasMore) return
+    // API не поддерживает пагинацию в текущей версии
+    postsHasMore.set(false)
   }
-  
-  // Следим за изменением поискового запроса
-  $effect(() => {
-    if ($searchQuery && $searchQuery.length >= 2) {
-      performSearch()
-    }
-  })
-  
-  // Следим за изменением фильтров
-  $effect(() => {
-    // Перезапускаем поиск при изменении фильтров
-  })
+
+  // Обработчик поиска из SearchBar
+  function handleSearch(query) {
+    performPostSearch(query)
+  }
 </script>
 
 <div class="app">
@@ -91,20 +64,19 @@
   
   <main class="main">
     <div class="container">
-      <SearchBar />
-      <FilterBar />
-      <GroupList 
-        groups={$groups} 
-        loading={$loading}
-        error={$error}
-        hasMore={$hasMore}
-        onLoadMore={loadMore}
+      <SearchBar onSearch={handleSearch} />
+
+      <PostList
+        posts={$posts}
+        loading={$postsLoading}
+        error={$postsError}
+        hasMore={$postsHasMore}
+        onLoadMore={loadMorePosts}
       />
-    </div>
+</div>
   </main>
   
   <Footer />
-  <GroupModal />
 </div>
 
 <style>
@@ -117,6 +89,35 @@
   .main {
     flex: 1;
     padding: 32px 0;
+  }
+
+  .search-mode {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    }
+
+  .mode-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .mode-btn:hover {
+    border-color: var(--primary);
+    color: var(--text-primary);
+  }
+
+  .mode-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
   }
 
   @media (max-width: 640px) {

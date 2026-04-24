@@ -22,7 +22,15 @@
 <svelte:window onkeydown={handleKeydown} />
 
 {#if $selectedGroup}
-  <div class="modal-backdrop" onclick={handleBackdropClick} role="dialog" aria-modal="true">
+  <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+  <div 
+    class="modal-backdrop" 
+    onclick={handleBackdropClick} 
+    onkeydown={handleKeydown}
+    role="dialog" 
+    aria-modal="true"
+    tabindex="-1"
+  >
     <div class="modal">
       <button class="close-btn" onclick={closeModal} aria-label="Закрыть">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
